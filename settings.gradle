@@ -1,0 +1,2 @@
+rootProject.name='Realtime Chat'
+include ':app'
