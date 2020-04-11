@@ -19,6 +19,9 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +33,11 @@ public class Chat extends AppCompatActivity {
     EditText edtMessage;
     ImageView btnSend;
     ListView listView;
+    TextView txtNumOfRoom;
 
     final String URL_SERVER = "https://chatbtt.herokuapp.com/";
     Socket socket;
+
     {
         try {
             socket = IO.socket(URL_SERVER);
@@ -55,6 +60,7 @@ public class Chat extends AppCompatActivity {
         edtMessage = findViewById(R.id.edtMessage);
         btnSend = findViewById(R.id.btnSend);
         listView = findViewById(R.id.msgShow);
+        txtNumOfRoom = findViewById(R.id.txtNumOfRoom);
 
         Intent intent = getIntent();
         String fullName = intent.getStringExtra("fullName");
@@ -67,6 +73,19 @@ public class Chat extends AppCompatActivity {
         listView.setAdapter(chatAdapter);
 
         socket.on("server-send-message", onNewMessage);
+        socket.on("socket-send-room", onNumOfRoom);
+        socket.on("server-send-num-in-room", onUpdateNumOfRoom);
+
+        edtMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
+                    socket.emit("typing");
+                } else {
+                    socket.emit("stop-typing");
+                }
+            }
+        });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +115,39 @@ public class Chat extends AppCompatActivity {
                     list.add(message);
                     chatAdapter.notifyDataSetChanged();
                     listView.setSelection(list.size() - 1);
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onNumOfRoom = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject object = (JSONObject) args[0];
+                    String numOfOnline;
+                    try {
+                        numOfOnline = object.getString("numOfOnline");
+                        txtNumOfRoom.setText(numOfOnline);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onUpdateNumOfRoom = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String data = args[0].toString();
+                    txtNumOfRoom.setText(data);
                 }
             });
         }

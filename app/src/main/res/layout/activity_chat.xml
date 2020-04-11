@@ -31,19 +31,18 @@
                 android:id="@+id/txtFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trung"
                 android:textStyle="bold"
                 android:textSize="20dp"
                 android:textColor="@android:color/holo_blue_light"/>
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/idroom"
                 android:text="Room ID: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -54,10 +53,36 @@
                 android:id="@+id/txtRoomID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trung"
-                android:textSize="20dp"/>
+                android:layout_toRightOf="@+id/idroom"
+                android:textSize="20dp"
+                android:maxWidth="210dp"/>
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/txvNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Online: "
+                android:textColor="@android:color/holo_green_light"
+                android:layout_toLeftOf="@+id/txtNumOfRoom"
+                android:layout_centerVertical="true"/>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/android_online"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/txvNum"/>
+
+            <TextView
+                android:id="@+id/txtNumOfRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textColor="@android:color/holo_green_light"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -78,7 +103,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="20dp"
-        android:layout_marginBottom="5dp">
+        android:paddingBottom="5dp">
 
         <EditText
             android:id="@+id/edtMessage"
@@ -97,7 +122,7 @@
             android:layout_height="50dp"
             android:padding="10dp"
             android:src="@drawable/android_send"
-            android:layout_marginHorizontal="5dp"
+            android:paddingHorizontal="5dp"
             android:background="?android:selectableItemBackground"/>
 
     </LinearLayout>
