@@ -1,10 +1,18 @@
 package com.example.realtimechat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,7 +34,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.realtimechat.App.CHANNEL_1_ID;
+import static com.example.realtimechat.App.CHANNEL_2_ID;
+
 public class Chat extends AppCompatActivity {
+
+    private NotificationManagerCompat notificationManager;
 
     TextView txtFullName;
     TextView txtRoomID;
@@ -55,6 +68,8 @@ public class Chat extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         socket.connect();
 
+        notificationManager = NotificationManagerCompat.from(this);
+
         txtFullName = findViewById(R.id.txtFullName);
         txtRoomID = findViewById(R.id.txtRoomID);
         edtMessage = findViewById(R.id.edtMessage);
@@ -75,6 +90,8 @@ public class Chat extends AppCompatActivity {
         socket.on("server-send-message", onNewMessage);
         socket.on("socket-send-room", onNumOfRoom);
         socket.on("server-send-num-in-room", onUpdateNumOfRoom);
+        socket.on("socket-typing", onSbIsTyping);
+        socket.on("socket-stop-typing", onSbStopTyping);
 
         edtMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -103,6 +120,25 @@ public class Chat extends AppCompatActivity {
         });
     }
 
+    public void sendOnChannel1(String name, String content) {
+
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), uri);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.android_chat);
+
+        Notification notification =
+                new NotificationCompat.Builder(this, CHANNEL_1_ID)
+                    .setSmallIcon(R.drawable.android_chat)
+                    .setLargeIcon(bitmap)
+                    .setContentTitle(name)
+                    .setContentText(content)
+                    .setAutoCancel(true)
+                     .build();
+
+        r.play();
+        notificationManager.notify(1, notification);
+    }
+
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -115,11 +151,11 @@ public class Chat extends AppCompatActivity {
                     list.add(message);
                     chatAdapter.notifyDataSetChanged();
                     listView.setSelection(list.size() - 1);
+                    sendOnChannel1(name, content);
                 }
             });
         }
     };
-
 
     private Emitter.Listener onNumOfRoom = new Emitter.Listener() {
         @Override
@@ -148,6 +184,30 @@ public class Chat extends AppCompatActivity {
                 public void run() {
                     String data = args[0].toString();
                     txtNumOfRoom.setText(data);
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onSbIsTyping = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    edtMessage.setHint("Someone is typing...");
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onSbStopTyping = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    edtMessage.setHint("Write a message...");
                 }
             });
         }
