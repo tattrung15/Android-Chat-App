@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,12 +17,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.github.nkzawa.engineio.client.transports.Polling;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity {
+
+    final String URL_SERVER = Config.URL_SERVER_CHAT;
 
     EditText edtName;
     EditText edtRoomID;
@@ -36,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    final String URL_SERVER = "https://chatbtt.herokuapp.com/";
     Socket socket;
     {
         try {

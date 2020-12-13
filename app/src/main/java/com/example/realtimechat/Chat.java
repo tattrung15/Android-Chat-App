@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.engineio.client.transports.Polling;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -39,6 +40,8 @@ import static com.example.realtimechat.App.CHANNEL_2_ID;
 
 public class Chat extends AppCompatActivity {
 
+    final String URL_SERVER = Config.URL_SERVER_CHAT;
+
     private NotificationManagerCompat notificationManager;
 
     TextView txtFullName;
@@ -48,7 +51,6 @@ public class Chat extends AppCompatActivity {
     ListView listView;
     TextView txtNumOfRoom;
 
-    final String URL_SERVER = "https://chatbtt.herokuapp.com/";
     Socket socket;
 
     {
